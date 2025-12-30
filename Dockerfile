@@ -1,5 +1,6 @@
 # GoReleaser Dockerfile - uses pre-built binary
-FROM gcr.io/distroless/static-debian12:nonroot
+# Using base-debian12 which includes CA certificates needed for HTTPS
+FROM gcr.io/distroless/base-debian12:nonroot
 
 # Copy the pre-built binary from GoReleaser
 COPY cw-agent /cw-agent

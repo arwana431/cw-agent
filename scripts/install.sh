@@ -1,6 +1,6 @@
 #!/bin/bash
 # CertWatch Agent Installation Script
-# Usage: curl -sSL https://get.certwatch.app | bash
+# Usage: curl -sSL https://certwatch.app/install.sh | bash
 #    or: curl -sSL https://raw.githubusercontent.com/certwatch-app/cw-agent/main/scripts/install.sh | bash
 
 set -e

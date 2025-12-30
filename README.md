@@ -24,6 +24,11 @@ SSL/TLS certificate monitoring agent for [CertWatch](https://certwatch.app). Mon
 
 ### 1. Install
 
+**Quick install (Linux/macOS):**
+```bash
+curl -sSL https://certwatch.app/install.sh | bash
+```
+
 **Using Go:**
 ```bash
 go install github.com/certwatch-app/cw-agent/cmd/cw-agent@latest

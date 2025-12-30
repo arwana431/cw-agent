@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/certwatch-app/cw-agent/internal/ui"
 	"github.com/certwatch-app/cw-agent/internal/version"
 )
 
@@ -14,12 +15,17 @@ var versionCmd = &cobra.Command{
 	Long:  `Print the version, git commit, and build date of the CertWatch Agent.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		info := version.GetInfo()
-		fmt.Printf("CertWatch Agent\n")
-		fmt.Printf("  Version:    %s\n", info.Version)
-		fmt.Printf("  Commit:     %s\n", info.GitCommit)
-		fmt.Printf("  Build Date: %s\n", info.BuildDate)
-		fmt.Printf("  Go Version: %s\n", info.GoVersion)
-		fmt.Printf("  Platform:   %s/%s\n", info.OS, info.Arch)
+
+		fmt.Println()
+		fmt.Println(ui.RenderAppHeader())
+		fmt.Println()
+
+		fmt.Println(ui.RenderKeyValue("Version", info.Version))
+		fmt.Println(ui.RenderKeyValue("Commit", info.GitCommit))
+		fmt.Println(ui.RenderKeyValue("Build Date", info.BuildDate))
+		fmt.Println(ui.RenderKeyValue("Go Version", info.GoVersion))
+		fmt.Println(ui.RenderKeyValue("Platform", info.OS+"/"+info.Arch))
+		fmt.Println()
 	},
 }
 

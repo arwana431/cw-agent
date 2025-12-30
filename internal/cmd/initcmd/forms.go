@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/charmbracelet/huh"
+
+	"github.com/certwatch-app/cw-agent/internal/ui"
 )
 
 // NewWelcomeForm creates the welcome and file configuration form.
@@ -24,7 +26,7 @@ func NewWelcomeForm(state *WizardState) *huh.Form {
 				Value(&state.ConfigPath).
 				Validate(ValidateConfigPath),
 		),
-	).WithTheme(CreateTheme())
+	).WithTheme(ui.CreateTheme())
 }
 
 // NewAPIForm creates the API configuration form.
@@ -43,7 +45,7 @@ func NewAPIForm(state *WizardState) *huh.Form {
 				EchoMode(huh.EchoModePassword).
 				Validate(ValidateAPIKey),
 		),
-	).WithTheme(CreateTheme())
+	).WithTheme(ui.CreateTheme())
 }
 
 // NewAgentForm creates the agent configuration form.
@@ -93,7 +95,7 @@ func NewAgentForm(state *WizardState) *huh.Form {
 				).
 				Value(&state.LogLevel),
 		),
-	).WithTheme(CreateTheme())
+	).WithTheme(ui.CreateTheme())
 }
 
 // NewCertificateForm creates a certificate entry form.
@@ -138,7 +140,7 @@ func NewCertificateForm(state *WizardState, certNum int) *huh.Form {
 				Affirmative("Yes").
 				Negative("No"),
 		),
-	).WithTheme(CreateTheme())
+	).WithTheme(ui.CreateTheme())
 }
 
 // NewOverwriteConfirmForm creates a form to confirm file overwrite.
@@ -152,5 +154,5 @@ func NewOverwriteConfirmForm(state *WizardState, path string) *huh.Form {
 				Affirmative("Yes, overwrite").
 				Negative("No, cancel"),
 		),
-	).WithTheme(CreateTheme())
+	).WithTheme(ui.CreateTheme())
 }

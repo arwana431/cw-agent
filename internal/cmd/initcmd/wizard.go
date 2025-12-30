@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/huh"
+
+	"github.com/certwatch-app/cw-agent/internal/ui"
 )
 
 // Wizard manages the interactive configuration wizard.
@@ -38,13 +40,13 @@ func (w *Wizard) Run() error {
 	go func() {
 		<-sigChan
 		fmt.Println()
-		fmt.Println(RenderWarning("Setup canceled by user"))
+		fmt.Println(ui.RenderWarning("Setup canceled by user"))
 		os.Exit(0)
 	}()
 
 	// Print header
 	fmt.Println()
-	fmt.Println(RenderHeader())
+	fmt.Println(ui.RenderAppHeader())
 	fmt.Println()
 
 	// Step 1: Welcome and file configuration
@@ -58,19 +60,19 @@ func (w *Wizard) Run() error {
 	}
 
 	// Step 3: API configuration
-	fmt.Println(RenderSection("API Configuration"))
+	fmt.Println(ui.RenderSection("API Configuration"))
 	if err := w.runAPIForm(); err != nil {
 		return w.handleError(err)
 	}
 
 	// Step 4: Agent configuration
-	fmt.Println(RenderSection("Agent Configuration"))
+	fmt.Println(ui.RenderSection("Agent Configuration"))
 	if err := w.runAgentForm(); err != nil {
 		return w.handleError(err)
 	}
 
 	// Step 5: Certificate configuration (loop)
-	fmt.Println(RenderSection("Certificates to Monitor"))
+	fmt.Println(ui.RenderSection("Certificates to Monitor"))
 	if err := w.runCertificateForms(); err != nil {
 		return w.handleError(err)
 	}
@@ -155,7 +157,7 @@ func (w *Wizard) handleExistingFile() error {
 	}
 
 	if !w.state.OverwriteFile {
-		fmt.Println(RenderWarning("Setup canceled: file already exists"))
+		fmt.Println(ui.RenderWarning("Setup canceled: file already exists"))
 		os.Exit(0)
 	}
 
@@ -165,44 +167,44 @@ func (w *Wizard) handleExistingFile() error {
 func (w *Wizard) handleError(err error) error {
 	if err == huh.ErrUserAborted {
 		fmt.Println()
-		fmt.Println(RenderWarning("Setup canceled"))
+		fmt.Println(ui.RenderWarning("Setup canceled"))
 		os.Exit(0)
 	}
 	fmt.Println()
-	fmt.Println(RenderError(err.Error()))
+	fmt.Println(ui.RenderError(err.Error()))
 	return err
 }
 
 func (w *Wizard) handleValidationError(err error) error {
 	fmt.Println()
-	fmt.Println(RenderError("Configuration validation failed:"))
-	fmt.Println(RenderError("  " + err.Error()))
+	fmt.Println(ui.RenderError("Configuration validation failed:"))
+	fmt.Println(ui.RenderError("  " + err.Error()))
 	fmt.Println()
-	fmt.Println(RenderInfo("Please run 'cw-agent init' again with corrected values."))
+	fmt.Println(ui.RenderInfo("Please run 'cw-agent init' again with corrected values."))
 	return err
 }
 
 func (w *Wizard) showSuccess() {
 	fmt.Println()
-	fmt.Println(RenderSuccess("Config written to " + w.state.ConfigPath))
-	fmt.Println(RenderSuccess("Validated successfully"))
+	fmt.Println(ui.RenderSuccess("Config written to " + w.state.ConfigPath))
+	fmt.Println(ui.RenderSuccess("Validated successfully"))
 	fmt.Println()
 
 	// Show summary
-	fmt.Println(TitleStyle.Render("Configuration Summary:"))
-	fmt.Println(MutedStyle.Render("  Agent:        ") + w.state.AgentName)
-	fmt.Println(MutedStyle.Render("  Certificates: ") + fmt.Sprintf("%d", len(w.state.Certificates)))
-	fmt.Println(MutedStyle.Render("  Sync:         ") + w.state.SyncInterval)
-	fmt.Println(MutedStyle.Render("  Scan:         ") + w.state.ScanInterval)
+	fmt.Println(ui.TitleStyle.Render("Configuration Summary:"))
+	fmt.Println(ui.RenderKeyValue("Agent", w.state.AgentName))
+	fmt.Println(ui.RenderKeyValue("Certificates", fmt.Sprintf("%d", len(w.state.Certificates))))
+	fmt.Println(ui.RenderKeyValue("Sync", w.state.SyncInterval))
+	fmt.Println(ui.RenderKeyValue("Scan", w.state.ScanInterval))
 	fmt.Println()
 
-	fmt.Println(TitleStyle.Render("Next steps:"))
+	fmt.Println(ui.TitleStyle.Render("Next steps:"))
 	fmt.Println()
 	fmt.Println("  To validate your config:")
-	fmt.Println("    " + RenderCode("cw-agent validate -c "+w.state.ConfigPath))
+	fmt.Println("    " + ui.RenderCode("cw-agent validate -c "+w.state.ConfigPath))
 	fmt.Println()
 	fmt.Println("  To start monitoring:")
-	fmt.Println("    " + RenderCode("cw-agent start -c "+w.state.ConfigPath))
+	fmt.Println("    " + ui.RenderCode("cw-agent start -c "+w.state.ConfigPath))
 	fmt.Println()
 }
 
@@ -273,6 +275,6 @@ func RunNonInteractive(outputPath string) error {
 		return err
 	}
 
-	fmt.Println(RenderSuccess("Config written to " + state.ConfigPath))
+	fmt.Println(ui.RenderSuccess("Config written to " + state.ConfigPath))
 	return nil
 }

@@ -12,25 +12,27 @@ import (
 
 	"github.com/certwatch-app/cw-agent/internal/config"
 	"github.com/certwatch-app/cw-agent/internal/scanner"
+	"github.com/certwatch-app/cw-agent/internal/state"
 	"github.com/certwatch-app/cw-agent/internal/version"
 )
 
 // Client handles communication with the CertWatch API
 type Client struct {
-	endpoint   string
-	apiKey     string
-	httpClient *http.Client
-	logger     *zap.Logger
-	agentName  string
-	agentID    string // Cached after first sync
+	endpoint     string
+	apiKey       string
+	httpClient   *http.Client
+	logger       *zap.Logger
+	agentName    string
+	stateManager *state.Manager
 }
 
-// New creates a new sync Client
-func New(cfg *config.Config, logger *zap.Logger) *Client {
+// New creates a new sync Client with state manager for agent ID persistence
+func New(cfg *config.Config, logger *zap.Logger, stateManager *state.Manager) *Client {
 	return &Client{
-		endpoint:  cfg.API.Endpoint,
-		apiKey:    cfg.API.Key,
-		agentName: cfg.Agent.Name,
+		endpoint:     cfg.API.Endpoint,
+		apiKey:       cfg.API.Key,
+		agentName:    cfg.Agent.Name,
+		stateManager: stateManager,
 		httpClient: &http.Client{
 			Timeout: cfg.API.Timeout,
 		},
@@ -49,9 +51,20 @@ func (c *Client) Sync(ctx context.Context, certs []config.CertificateConfig, res
 		return nil, err
 	}
 
-	// Cache agent ID for future requests
+	// Persist agent ID and name for future restarts
 	if resp.Success && resp.AgentID != "" {
-		c.agentID = resp.AgentID
+		c.stateManager.SetAgentID(resp.AgentID)
+		c.stateManager.SetAgentName(c.agentName)
+		c.stateManager.SetLastSyncAt(resp.Data.SyncedAt)
+
+		// Clear previous agent ID after successful migration
+		if c.stateManager.GetPreviousAgentID() != "" && resp.Data.Migrated > 0 {
+			c.stateManager.ClearPreviousAgentID()
+		}
+
+		if err := c.stateManager.Save(); err != nil {
+			c.logger.Warn("failed to save state", zap.Error(err))
+		}
 	}
 
 	return resp, nil
@@ -113,11 +126,12 @@ func (c *Client) buildSyncRequest(certs []config.CertificateConfig, results []sc
 	hostname := getHostname()
 
 	return &SyncRequest{
-		AgentID:      c.agentID,
-		AgentName:    c.agentName,
-		AgentVersion: version.GetVersion(),
-		AgentHost:    hostname,
-		Certificates: certData,
+		AgentID:         c.stateManager.GetAgentID(),
+		PreviousAgentID: c.stateManager.GetPreviousAgentID(),
+		AgentName:       c.agentName,
+		AgentVersion:    version.GetVersion(),
+		AgentHost:       hostname,
+		Certificates:    certData,
 	}
 }
 
@@ -182,9 +196,9 @@ func (c *Client) doRequest(ctx context.Context, method, path string, body interf
 	return &syncResp, nil
 }
 
-// GetAgentID returns the cached agent ID (empty if not yet synced)
+// GetAgentID returns the persisted agent ID (empty if not yet synced)
 func (c *Client) GetAgentID() string {
-	return c.agentID
+	return c.stateManager.GetAgentID()
 }
 
 func getHostname() string {

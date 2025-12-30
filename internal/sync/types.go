@@ -7,11 +7,12 @@ import (
 
 // SyncRequest represents the agent sync request payload
 type SyncRequest struct {
-	AgentID      string                `json:"agent_id,omitempty"`
-	AgentName    string                `json:"agent_name"`
-	AgentVersion string                `json:"agent_version,omitempty"`
-	AgentHost    string                `json:"agent_hostname,omitempty"`
-	Certificates []CertificateSyncData `json:"certificates"`
+	AgentID         string                `json:"agent_id,omitempty"`
+	PreviousAgentID string                `json:"previous_agent_id,omitempty"` // For migration when agent name changes
+	AgentName       string                `json:"agent_name"`
+	AgentVersion    string                `json:"agent_version,omitempty"`
+	AgentHost       string                `json:"agent_hostname,omitempty"`
+	Certificates    []CertificateSyncData `json:"certificates"`
 }
 
 // CertificateSyncData represents certificate data sent to the API
@@ -53,11 +54,13 @@ type SyncResponse struct {
 
 // SyncResponseData contains the sync result details
 type SyncResponseData struct {
+	SyncedAt  time.Time   `json:"synced_at"`
 	Errors    []SyncError `json:"errors,omitempty"`
 	Created   int         `json:"created"`
 	Updated   int         `json:"updated"`
 	Unchanged int         `json:"unchanged"`
 	Orphaned  int         `json:"orphaned"`
+	Migrated  int         `json:"migrated"` // Certs migrated from previous agent
 }
 
 // SyncError represents an error for a specific certificate during sync

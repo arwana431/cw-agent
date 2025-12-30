@@ -12,20 +12,22 @@ import (
 
 	"github.com/certwatch-app/cw-agent/internal/config"
 	"github.com/certwatch-app/cw-agent/internal/scanner"
+	"github.com/certwatch-app/cw-agent/internal/state"
 	"github.com/certwatch-app/cw-agent/internal/sync"
 )
 
 // Agent orchestrates certificate scanning and syncing
 type Agent struct {
-	config   *config.Config
-	scanner  *scanner.Scanner
-	client   *sync.Client
-	logger   *zap.Logger
-	lastScan []scanner.ScanResult
+	config       *config.Config
+	scanner      *scanner.Scanner
+	client       *sync.Client
+	stateManager *state.Manager
+	logger       *zap.Logger
+	lastScan     []scanner.ScanResult
 }
 
-// New creates a new Agent
-func New(cfg *config.Config) (*Agent, error) {
+// New creates a new Agent with the given configuration and state manager
+func New(cfg *config.Config, stateManager *state.Manager) (*Agent, error) {
 	// Setup logger
 	logger, err := setupLogger(cfg.Agent.LogLevel)
 	if err != nil {
@@ -35,14 +37,15 @@ func New(cfg *config.Config) (*Agent, error) {
 	// Create scanner
 	s := scanner.New(cfg.API.Timeout, cfg.Agent.Concurrency, logger)
 
-	// Create sync client
-	client := sync.New(cfg, logger)
+	// Create sync client with state manager
+	client := sync.New(cfg, logger, stateManager)
 
 	return &Agent{
-		config:  cfg,
-		scanner: s,
-		client:  client,
-		logger:  logger,
+		config:       cfg,
+		scanner:      s,
+		client:       client,
+		stateManager: stateManager,
+		logger:       logger,
 	}, nil
 }
 
@@ -155,6 +158,7 @@ func (a *Agent) syncWithCloud(ctx context.Context) error {
 		zap.Int("updated", resp.Data.Updated),
 		zap.Int("unchanged", resp.Data.Unchanged),
 		zap.Int("orphaned", resp.Data.Orphaned),
+		zap.Int("migrated", resp.Data.Migrated),
 		zap.Int("errors", len(resp.Data.Errors)),
 	)
 

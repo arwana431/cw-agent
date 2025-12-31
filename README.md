@@ -16,6 +16,7 @@ SSL/TLS certificate monitoring agent for [CertWatch](https://certwatch.app). Mon
 - **Prometheus metrics** - Expose certificate and agent metrics at `/metrics`
 - **Health endpoints** - Kubernetes-ready `/healthz`, `/readyz`, `/livez` endpoints
 - **Heartbeat support** - Agent offline detection and alerting
+- **Helm chart** - Official Helm chart for Kubernetes with GitOps support
 - **Agent state persistence** - Agent ID survives restarts, supports name changes
 - **Smart certificate migration** - Certificates transfer when resetting agents
 - **Chain validation** - Detect chain issues, expiration, and weak cryptography
@@ -271,6 +272,41 @@ services:
       - ./certwatch.yaml:/etc/certwatch/certwatch.yaml:ro
 ```
 
+### Kubernetes (Helm)
+
+Deploy the agent to Kubernetes using our official Helm chart:
+
+**Quick install (for testing):**
+
+```bash
+helm install cw-agent oci://ghcr.io/certwatch-app/helm-charts/cw-agent \
+  --set agent.name=my-cluster \
+  --set apiKey.value=cw_your_api_key_here \
+  --set certificates[0].hostname=api.example.com
+```
+
+**Production install (recommended):**
+
+```bash
+# Create a secret for your API key
+kubectl create secret generic cw-agent-api-key \
+  --from-literal=api-key=cw_your_api_key_here
+
+# Install the chart
+helm install cw-agent oci://ghcr.io/certwatch-app/helm-charts/cw-agent \
+  --set agent.name=my-cluster \
+  --set apiKey.existingSecret.name=cw-agent-api-key \
+  --set certificates[0].hostname=api.example.com
+```
+
+The chart includes:
+- Secure defaults (non-root, read-only filesystem, dropped capabilities)
+- Prometheus ServiceMonitor support
+- Kubernetes health probes pre-configured
+- Support for ArgoCD and FluxCD
+
+For full configuration options, see the [Helm Chart README](charts/cw-agent/README.md).
+
 ## Observability
 
 ### Prometheus Metrics
@@ -373,7 +409,15 @@ cw-agent/
 
 ## Changelog
 
-### v0.3.0 (Current)
+### v0.4.0 (Current)
+
+- **Helm chart** - Official Helm chart for Kubernetes deployments via OCI registry
+- **Flexible API key config** - Support both inline `apiKey.value` and `apiKey.existingSecret` for production
+- **Secure K8s defaults** - Non-root, read-only filesystem, dropped capabilities
+- **GitOps ready** - ArgoCD and FluxCD examples included
+- **Prometheus ServiceMonitor** - Optional ServiceMonitor for Prometheus Operator users
+
+### v0.3.0
 
 - **Prometheus metrics** - Expose certificate, scan, sync, and agent metrics at `/metrics`
 - **Health endpoints** - Kubernetes-ready `/healthz`, `/readyz`, `/livez` endpoints

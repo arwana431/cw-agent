@@ -62,7 +62,7 @@ spec:
               mountPath: /etc/certwatch
               readOnly: true
             - name: state
-              mountPath: /etc/certwatch-state
+              mountPath: /var/lib/certwatch
       volumes:
         - name: config
           configMap:

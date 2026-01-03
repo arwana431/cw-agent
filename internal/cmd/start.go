@@ -60,12 +60,20 @@ func runStart(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("invalid configuration: %w", validationErr)
 	}
 
-	// Initialize state manager using the config file path from viper
+	// Initialize state manager
+	// Use dedicated state directory if it exists (for containers with read-only config mounts)
 	configPath := viper.ConfigFileUsed()
 	if configPath == "" {
 		configPath = "./certwatch.yaml" // fallback
 	}
-	stateManager := state.NewManager(configPath)
+
+	var stateManager *state.Manager
+	if _, statErr := os.Stat(state.DefaultStateDir); statErr == nil {
+		stateManager = state.NewManagerWithStateDir(state.DefaultStateDir)
+	} else {
+		stateManager = state.NewManager(configPath)
+	}
+
 	if loadErr := stateManager.Load(); loadErr != nil {
 		// Log warning but continue - corrupted state is treated as first run
 		fmt.Println(ui.RenderWarning(loadErr.Error()))

